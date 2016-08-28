@@ -1,0 +1,33 @@
+#import all helper functions 
+
+import numpy as np
+import pandas as pd
+from pandas_datareader import data as web
+import matplotlib.pyplot as plt
+import seaborn as sns; sns.set()
+%matplotlib inline
+import warnings; warnings.simplefilter('ignore')
+
+#define FANG stocks as a list
+stocks = ['FB', 'AAPL', 'NFLX', 'GOOG']
+data = pd.DataFrame()
+
+#get the adjusted close for each price
+for sym in stocks:
+    data[sym] = web.DataReader(sym, data_source = 'yahoo')['Adj Close']
+    
+#normalize data to a base of 100 to make log_rets calculcation comparable
+(data/data.ix[0] * 100)
+
+#get the logartihmic returns for each stock
+log_rets = np.log(data/data.shift(1)) * 252
+
+#annualize the returns
+rets = log_rets.mean() * 252
+
+#create a numpy array of equal weights
+weights = np.array([0.2, 0.2, 0.2, 0.2])
+
+#calculate portfolio returns 
+np.dot(weights, rets)
+    
