@@ -31,3 +31,11 @@ weights = np.array([0.2, 0.2, 0.2, 0.2])
 #calculate portfolio returns 
 np.dot(weights, rets)
     
+#calculate portfolio covariance matrix
+log_rets.cov() * 252
+
+#calculate total portfolio variance
+pvar = np.dot(weights.T, np.dot(log_rets.cov() * 252, weights))
+
+#calculate portfolio volatiltiy 
+pvol = pvar ** 0.5
