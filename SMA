@@ -1,1 +1,16 @@
+#create a list of stocks in portfolio
+stocks = ['FB', 'AAPL', 'NFLX', 'GOOGL']
 
+#an empty dataframe to hold the 42day moving average
+data = []
+
+for s in stocks:
+    data[s] = web.DataReader(s, data_source = 'yahoo', start = '2013-01-01')['Adj Close']
+    data[s_SMA] = pd.rolling_mean(data[s], window = 42)
+    
+#an empty dataframe to hold the 252day moving average
+data_long = pd.DataFrame()
+
+for m in stocks: 
+    data_long[m] = web.DataReader(m, data_source = 'yahoo', start = '2013-01-01')['Adj Close']
+    data_long[m] = pd.rolling_mean(data[m], window = 252)
