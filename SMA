@@ -1,4 +1,4 @@
-import numpy as np
+ import numpy as np
 import pandas as pd
 from pandas_datareader import data as web
 import matplotlib.pyplot as plt
@@ -40,10 +40,10 @@ portfolio['Value'] = data.dot(weights)
 p_SMA42 = SMA_42.dot(weights)
 p_SMA252 = SMA_252.dot(weights)
 
-
-#vectorized evaluation of the trading condition 
 portfolio['position'] = np.where(p_SMA42 > p_SMA252, 1, -1)
-#portfolio['position'] = portfolio['position'].astype(int)
-plt.plot(portfolio['position'])
+portfolio['change'] = np.log(portfolio['Value']/portfolio['Value'].shift(1))
+portfolio['change'] = portfolio['change'].fillna(0)
+portfolio['strategy'] = portfolio['position'].shift(1) * portfolio['change']
+portfolio[['change', 'strategy']].cumsum().apply(np.exp).tail()
 
-portfolio['change'] = (portfolio['Value']/portfolio['Value'].shift(1))
+portfolio[['change', 'strategy']].cumsum().apply(np.exp).plot(figsize = (10, 6))
