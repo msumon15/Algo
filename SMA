@@ -1,16 +1,49 @@
-#create a list of stocks in portfolio
+import numpy as np
+import pandas as pd
+from pandas_datareader import data as web
+import matplotlib.pyplot as plt
+import seaborn as sns; sns.set()
+%matplotlib inline
+
+#define portfolio 
 stocks = ['FB', 'AAPL', 'NFLX', 'GOOGL']
 
-#an empty dataframe to hold the 42day moving average
-data = []
 
-for s in stocks:
-    data[s] = web.DataReader(s, data_source = 'yahoo', start = '2013-01-01')['Adj Close']
-    data[s_SMA] = pd.rolling_mean(data[s], window = 42)
-    
-#an empty dataframe to hold the 252day moving average
-data_long = pd.DataFrame()
+#retrieve data 
+data = pd.DataFrame()
+for sym in stocks:
+    data[sym] = web.DataReader(sym, data_source = 'yahoo')['Adj Close']
 
-for m in stocks: 
-    data_long[m] = web.DataReader(m, data_source = 'yahoo', start = '2013-01-01')['Adj Close']
-    data_long[m] = pd.rolling_mean(data[m], window = 252)
+#define individual SMA42
+SMA_42 = pd.DataFrame()
+
+for stock in data:
+
+    SMA_42[stock] = pd.rolling_mean(data[stock], window = 42)
+    SMA_42.fillna('100')
+
+#define individual SMA252
+SMA_252 = pd.DataFrame()
+
+for stock in data:
+
+    SMA_252[stock] = pd.rolling_mean(data[stock], window = 252)
+    SMA_252.fillna('100')
+
+#weighted sum to calculate portfolio SMA42 & SMA252
+weights = np.array([0.2, 0.2, 0.2, 0.2])
+
+#calculate portfolio
+portfolio = pd.DataFrame()
+portfolio['Value'] = data.dot(weights)
+
+p_SMA42 = SMA_42.dot(weights)
+p_SMA252 = SMA_252.dot(weights)
+
+
+#vectorized evaluation of the trading condition 
+portfolio['position'] = np.where(p_SMA42 > p_SMA252, 1, -1)
+#portfolio['position'] = portfolio['position'].astype(int)
+plt.plot(portfolio['position'])
+
+portfolio['change'] = (portfolio['Value']/portfolio['Value'].shift(1))
