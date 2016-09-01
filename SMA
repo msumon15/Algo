@@ -1,4 +1,4 @@
- import numpy as np
+import numpy as np
 import pandas as pd
 from pandas_datareader import data as web
 import matplotlib.pyplot as plt
@@ -40,10 +40,16 @@ portfolio['Value'] = data.dot(weights)
 p_SMA42 = SMA_42.dot(weights)
 p_SMA252 = SMA_252.dot(weights)
 
-portfolio['position'] = np.where(p_SMA42 > p_SMA252, 1, -1)
+#determine trade signal
+portfolio['position'] = np.where(p_SMA42 > p_SMA252, -1, 1)
+
+#calculate portfolio return
 portfolio['change'] = np.log(portfolio['Value']/portfolio['Value'].shift(1))
 portfolio['change'] = portfolio['change'].fillna(0)
+
+#calculate SMA strategy return
 portfolio['strategy'] = portfolio['position'].shift(1) * portfolio['change']
 portfolio[['change', 'strategy']].cumsum().apply(np.exp).tail()
 
+#plot the total return of simply holding portfolio and trading off the signal
 portfolio[['change', 'strategy']].cumsum().apply(np.exp).plot(figsize = (10, 6))
